@@ -34,9 +34,11 @@ function create() {
     // Create paddles and ball
     playerPaddle = this.add.rectangle(50, 300, 20, 100, 0xff0000); // Left paddle
     this.physics.add.existing(playerPaddle);
+    playerPaddle.body.setImmovable(true);
 
     opponentPaddle = this.add.rectangle(750, 300, 20, 100, 0x0000ff); // Right paddle
     this.physics.add.existing(opponentPaddle);
+    opponentPaddle.body.setImmovable(true);
 
     ball = this.add.circle(400, 300, 15, 0xffff00); // Create the ball
     this.physics.add.existing(ball);
@@ -58,9 +60,11 @@ function create() {
 
     // Listen for player assignments and updates
     socket.on('currentPlayers', (players) => {
+        // Check if this player is the host
         if (players[socket.id] && players[socket.id].isHost) {
             isHost = true;
             console.log('You are the host');
+            startBallMovement(); // Start ball movement when this client is the host
         }
 
         // Update paddles' positions
@@ -86,17 +90,11 @@ function create() {
             ball.setPosition(data.x, data.y);
         }
     });
-
-    // Start the ball motion if this client is the host
-    if (isHost) {
-        startBallMovement();
-    }
 }
 
 function update() {
     // If the client is the host, it updates the ball
     if (isHost) {
-        console.log('x');
         // Emit the ball's position to the other player
         socket.emit('ballUpdate', { x: ball.x, y: ball.y });
     }
