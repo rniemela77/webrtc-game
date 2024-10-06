@@ -2,8 +2,8 @@ const socket = io();
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
     scene: {
         preload: preload,
         create: create,
@@ -31,16 +31,20 @@ function preload() {
 }
 
 function create() {
+    const paddleWidth = window.innerWidth * 0.025;
+    const paddleHeight = window.innerHeight * 0.15;
+    const ballRadius = window.innerWidth * 0.02;
+
     // Create paddles and ball
-    leftPaddle = this.add.rectangle(50, 300, 20, 100, 0xff0000); // Left paddle
+    leftPaddle = this.add.rectangle(paddleWidth, window.innerHeight / 2, paddleWidth, paddleHeight, 0xff0000); // Left paddle
     this.physics.add.existing(leftPaddle);
     leftPaddle.body.setImmovable(true);
 
-    rightPaddle = this.add.rectangle(750, 300, 20, 100, 0x0000ff); // Right paddle
+    rightPaddle = this.add.rectangle(window.innerWidth - paddleWidth, window.innerHeight / 2, paddleWidth, paddleHeight, 0x0000ff); // Right paddle
     this.physics.add.existing(rightPaddle);
     rightPaddle.body.setImmovable(true);
 
-    ball = this.add.circle(400, 300, 15, 0xffff00); // Create the ball
+    ball = this.add.circle(window.innerWidth / 2, window.innerHeight / 2, ballRadius, 0xffff00); // Create the ball
     this.physics.add.existing(ball);
 
     // Set ball physics properties
@@ -49,7 +53,7 @@ function create() {
 
     // Handle paddle controls
     this.input.on('pointermove', (pointer) => {
-        const y = Phaser.Math.Clamp(pointer.y, 50, 550);
+        const y = Phaser.Math.Clamp(pointer.y, paddleHeight / 2, window.innerHeight - paddleHeight / 2);
         if (isHost) {
             leftPaddle.setY(y);
             socket.emit('paddleMove', { y });
