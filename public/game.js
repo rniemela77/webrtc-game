@@ -63,9 +63,10 @@ function create() {
       if (leftPaddle.body.y > window.innerHeight - paddleHeight * 1.5) {
         // make left paddle jump
         leftPaddle.body.setVelocityY(-1500); // Adjusted jump velocity
-      } else {
+      } else if (leftPaddle.body.velocity.x === 0) {
         // make left paddle dive to the right
         leftPaddle.body.setVelocityX(500); // Adjusted dive velocity
+        leftPaddle.body.setVelocityY(0);
       }
     } else {
       if (rightPaddle.body.y > window.innerHeight - paddleHeight * 1.5) {
@@ -124,5 +125,27 @@ function update() {
     leftPaddle.body.setVelocityX(0);
   } else if (rightPaddle.y > window.innerHeight - rightPaddle.height) {
     rightPaddle.body.setVelocityX(0);
+  }
+
+  // if leftPaddle collides with rightPaddle, destroy the lower one
+  if (
+    Phaser.Geom.Intersects.RectangleToRectangle(
+      leftPaddle.getBounds(),
+      rightPaddle.getBounds()
+    )
+  ) {
+    if (leftPaddle.y > rightPaddle.y) {
+      // reset positions
+      leftPaddle.y = window.innerHeight / 2;
+      rightPaddle.y = window.innerHeight / 2;
+      leftPaddle.x = leftPaddle.width;
+      rightPaddle.x = window.innerWidth - rightPaddle.width;
+    } else {
+      // reset positions
+      leftPaddle.y = window.innerHeight / 2;
+      rightPaddle.y = window.innerHeight / 2;
+      leftPaddle.x = leftPaddle.width;
+      rightPaddle.x = window.innerWidth - rightPaddle.width;
+    }
   }
 }
