@@ -1,0 +1,17 @@
+{
+  "name": "webrtc-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "phaser": "^3.85.2",
+    "socket.io": "^4.8.0"
+  }
+}
