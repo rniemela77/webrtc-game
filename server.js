@@ -30,8 +30,9 @@ io.on('connection', (socket) => {
     socket.on('paddleMove', (data) => {
         if (players[socket.id]) {
             players[socket.id].paddleY = data.y; // Update paddle position
+            players[socket.id].paddleX = data.x; // Update paddle position
             // Broadcast the updated position to other players
-            socket.broadcast.emit('paddleMove', { id: socket.id, y: data.y });
+            socket.broadcast.emit('paddleMove', { id: socket.id, y: data.y, x: data.x });
         }
     });
 

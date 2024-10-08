@@ -12,7 +12,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 2000 }, // Increased gravity to make paddles feel heavier
+      gravity: { y: 2500 }, // Increased gravity to make paddles feel heavier
       debug: false,
       // Enable world bounds
       setBounds: true,
@@ -36,7 +36,7 @@ function create() {
 
   // Create paddles
   leftPaddle = this.add.rectangle(
-    paddleWidth,
+    window.innerWidth / 4,
     window.innerHeight / 2,
     paddleWidth,
     paddleHeight,
@@ -47,7 +47,7 @@ function create() {
   leftPaddle.body.collideWorldBounds = true; // Enable collision with world bounds
 
   rightPaddle = this.add.rectangle(
-    window.innerWidth - paddleWidth,
+    window.innerWidth / 4 * 3,
     window.innerHeight / 2,
     paddleWidth,
     paddleHeight,
@@ -61,16 +61,18 @@ function create() {
   this.input.on("pointerdown", (pointer) => {
     if (isHost) {
       if (leftPaddle.body.y > window.innerHeight - paddleHeight * 1.5) {
-        // make left paddle jump
-        leftPaddle.body.setVelocityY(-1500); // Adjusted jump velocity
+        // JUMP
+        leftPaddle.body.setVelocityY(-2000); // Adjusted jump velocity
       } else if (leftPaddle.body.velocity.x === 0) {
-        // make left paddle dive to the right
-        leftPaddle.body.setVelocityX(500); // Adjusted dive velocity
-        leftPaddle.body.setVelocityY(0);
+        // DIVE
+        leftPaddle.body.setVelocityX(800); // Adjusted dive velocity
+        leftPaddle.body.setVelocityY(
+            leftPaddle.body.velocity.y + 1500
+        );
       }
     } else {
       if (rightPaddle.body.y > window.innerHeight - paddleHeight * 1.5) {
-        // make right paddle jump
+        // JUMP
         rightPaddle.body.setVelocityY(-1500); // Adjusted jump velocity
       }
     }
@@ -106,8 +108,10 @@ function create() {
   socket.on("paddleMove", (data) => {
     if (isHost) {
       rightPaddle.setY(data.y);
+      rightPaddle.setX(data.x);
     } else {
       leftPaddle.setY(data.y);
+      leftPaddle.setX(data.x);
     }
   });
 }
@@ -115,9 +119,9 @@ function create() {
 function update() {
   // No ball-related updates needed
   if (isHost) {
-    socket.emit("paddleMove", { y: leftPaddle.y });
+    socket.emit("paddleMove", { x: leftPaddle.x, y: leftPaddle.y });
   } else {
-    socket.emit("paddleMove", { y: rightPaddle.y });
+    socket.emit("paddleMove", { x: rightPaddle.x, y: rightPaddle.y });
   }
 
   // if a paddle hits the ground, stop it
